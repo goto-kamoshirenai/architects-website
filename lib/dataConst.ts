@@ -1,12 +1,12 @@
 export interface ArchitectSite {
-  id: string
-  url: string
-  name: string
-  furigana: string
-  isInternational: boolean
-  location: string
-  canDisplayIframe: boolean
-  thumbnail?: string
+  id: string;
+  url: string;
+  name: string;
+  furigana: string;
+  isInternational: boolean;
+  location: string;
+  canDisplayIframe: boolean;
+  thumbnail?: string;
 }
 
 export const architectSites: ArchitectSite[] = [
@@ -55,5 +55,4 @@ export const architectSites: ArchitectSite[] = [
     location: "東京都",
     canDisplayIframe: true,
   },
-]
-
+];

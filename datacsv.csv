@@ -1,0 +1,6 @@
+id,url,name,furigana,isInternational,location,canDisplayIframe
+jun-igarashi,https://jun-igarashi.jp/,五十嵐淳建築設計事務所,いがらしじゅんけんちくせっけいじむしょ,false,北海道,true
+big,https://big.dk/,BIG (Bjarke Ingels Group),ビッグ,true,デンマーク,false
+mvrdv,https://www.mvrdv.com/,MVRDV,エムブイアールディーブイ,true,オランダ,false
+kkaa,https://kkaa.co.jp/,隈研吾建築都市設計事務所,くまけんごけんちくとしせっけいじむしょ,false,東京都,true
+yasutaka-yoshimura,https://www.yasutakayoshimura.com/,吉村靖孝建築設計事務所,よしむらやすたかけんちくせっけいじむしょ,false,東京都,true

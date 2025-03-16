@@ -64,14 +64,10 @@ export function SiteGrid({ sites }: SiteGridProps) {
   return (
     <div className="space-y-8">
       <div
-        className={`sticky top-16 z-10 py-4 backdrop-blur-md bg-background/80 transition-all duration-300 ${
+        className={`sticky top-16 z-10 p-2 backdrop-blur-md bg-background transition-all duration-300 ${
           isScrolled ? "shadow-md" : ""
         }`}
       >
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold">建築家サイト一覧</h2>
-        </div>
-
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -171,13 +167,13 @@ export function SiteGrid({ sites }: SiteGridProps) {
       </div>
 
       {filteredSites.length === 0 ? (
-        <div className="text-center py-20">
+        <div className="text-center py-10">
           <p className="text-muted-foreground text-lg">
             No results found. Try adjusting your search.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
           {filteredSites.map((site, index) => (
             <SiteCard key={site.id || `site-${index}`} site={site} />
           ))}

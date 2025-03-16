@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,9 +28,7 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          Architect&apos;s website
-        </Link>
+        <Image src="/logo-short.svg" alt="logo" width={70} height={24} />
         <nav className="hidden md:flex space-x-8">
           <Link
             href="/"

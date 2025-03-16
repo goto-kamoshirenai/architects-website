@@ -37,13 +37,7 @@ export function Header() {
             Home
           </Link>
           <Link
-            href="#"
-            className="font-medium text-primary/80 hover:text-primary transition-colors"
-          >
-            About
-          </Link>
-          <Link
-            href="#"
+            href="/contact"
             className="font-medium text-primary/80 hover:text-primary transition-colors"
           >
             Contact
@@ -71,14 +65,7 @@ export function Header() {
               Home
             </Link>
             <Link
-              href="#"
-              className="font-medium text-primary/80 hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="#"
+              href="/contact"
               className="font-medium text-primary/80 hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >

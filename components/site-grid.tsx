@@ -35,7 +35,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showInternational, setShowInternational] = useState(true);
   const [showDomestic, setShowDomestic] = useState(true);
-  const [showIframeOnly, setShowIframeOnly] = useState(false);
+  const [showIframeOnly, setShowIframeOnly] = useState(true);
   const [sortOrder, setSortOrder] = useState<"name" | "location">("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);

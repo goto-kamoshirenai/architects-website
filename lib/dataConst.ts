@@ -9,50 +9,51 @@ export interface ArchitectSite {
   thumbnail?: string;
 }
 
-export const architectSites: ArchitectSite[] = [
-  {
-    id: "jun-igarashi",
-    url: "https://jun-igarashi.jp/",
-    name: "五十嵐淳建築設計事務所",
-    furigana: "いがらしじゅんけんちくせっけいじむしょ",
-    isInternational: false,
-    location: "北海道",
-    canDisplayIframe: true,
-  },
-  {
-    id: "big",
-    url: "https://big.dk/",
-    name: "BIG (Bjarke Ingels Group)",
-    furigana: "ビッグ",
-    isInternational: true,
-    location: "デンマーク",
-    canDisplayIframe: false,
-  },
-  {
-    id: "mvrdv",
-    url: "https://www.mvrdv.com/",
-    name: "MVRDV",
-    furigana: "エムブイアールディーブイ",
-    isInternational: true,
-    location: "オランダ",
-    canDisplayIframe: false,
-  },
-  {
-    id: "kkaa",
-    url: "https://kkaa.co.jp/",
-    name: "隈研吾建築都市設計事務所",
-    furigana: "くまけんごけんちくとしせっけいじむしょ",
-    isInternational: false,
-    location: "東京都",
-    canDisplayIframe: true,
-  },
-  {
-    id: "yasutaka-yoshimura",
-    url: "https://www.yasutakayoshimura.com/",
-    name: "吉村靖孝建築設計事務所",
-    furigana: "よしむらやすたかけんちくせっけいじむしょ",
-    isInternational: false,
-    location: "東京都",
-    canDisplayIframe: true,
-  },
-];
+import fs from "fs";
+import path from "path";
+import { parse } from "csv-parse/sync";
+
+// CSVレコードの型定義
+interface CSVRecord {
+  id: string;
+  url: string;
+  name: string;
+  furigana: string;
+  isInternational: string;
+  location: string;
+  canDisplayIframe: string;
+}
+
+// CSVファイルからデータを読み込む関数
+function loadArchitectSitesFromCSV(): ArchitectSite[] {
+  try {
+    // CSVファイルのパスを取得
+    const csvFilePath = path.join(process.cwd(), "lib", "defalutData.csv");
+
+    // CSVファイルを読み込む
+    const csvData = fs.readFileSync(csvFilePath, "utf8");
+
+    // CSVをパースする
+    const records = parse(csvData, {
+      columns: true,
+      skip_empty_lines: true,
+    }) as CSVRecord[];
+
+    // データを変換する
+    return records.map((record: CSVRecord) => ({
+      id: record.id,
+      url: record.url,
+      name: record.name,
+      furigana: record.furigana.trim(),
+      isInternational: record.isInternational === "Yes",
+      location: record.location,
+      canDisplayIframe: record.canDisplayIframe === "Yes",
+    }));
+  } catch (error) {
+    console.error("CSVファイルの読み込みに失敗しました:", error);
+    throw new Error("CSVファイルの読み込みに失敗しました");
+  }
+}
+
+// CSVからデータを読み込む
+export const architectSites: ArchitectSite[] = loadArchitectSitesFromCSV();

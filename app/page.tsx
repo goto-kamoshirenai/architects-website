@@ -23,14 +23,7 @@ export default async function Home() {
         {sites && sites.length > 0 ? (
           <SiteGrid sites={sites} />
         ) : (
-          <div>
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md mb-6">
-              <p>
-                Notionデータベースからデータを取得できませんでした。ローカルデータを表示しています。
-              </p>
-            </div>
-            <SiteGrid sites={architectSites} />
-          </div>
+          <SiteGrid sites={architectSites} />
         )}
       </main>
     );

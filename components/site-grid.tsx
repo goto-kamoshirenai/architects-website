@@ -35,7 +35,6 @@ export function SiteGrid({ sites }: SiteGridProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showInternational, setShowInternational] = useState(true);
   const [showDomestic, setShowDomestic] = useState(true);
-  const [showIframeOnly, setShowIframeOnly] = useState(true);
   const [sortOrder, setSortOrder] = useState<"name" | "location" | "rate">(
     "rate"
   );
@@ -62,20 +61,14 @@ export function SiteGrid({ sites }: SiteGridProps) {
   // 検索条件が変わったらページを1に戻す
   useEffect(() => {
     setCurrentPage(1);
-  }, [
-    searchTerm,
-    showInternational,
-    showDomestic,
-    showIframeOnly,
-    itemsPerPage,
-  ]);
+  }, [searchTerm, showInternational, showDomestic, itemsPerPage]);
 
   const filteredSites = sites
     .filter((site) => {
       // notQuoteがtrueのデータは除外
-      if (site.notQuote) {
-        return false;
-      }
+      // if (site.notQuote) {
+      //   return false;
+      // }
 
       const matchesSearch =
         site.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -86,10 +79,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
         (showInternational && site.isInternational) ||
         (showDomestic && !site.isInternational);
 
-      const matchesIframeFilter = !showIframeOnly || site.canDisplayIframe;
-
-      const shouldInclude =
-        matchesSearch && matchesFilter && matchesIframeFilter;
+      const shouldInclude = matchesSearch && matchesFilter;
 
       return shouldInclude;
     })
@@ -97,7 +87,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
       if (sortOrder === "rate") {
         return b.rate - a.rate;
       } else if (sortOrder === "name") {
-        return a.name.localeCompare(b.name);
+        return a.furigana.localeCompare(b.furigana);
       } else if (sortOrder === "location") {
         return a.location.localeCompare(b.location);
       } else {
@@ -221,18 +211,6 @@ export function SiteGrid({ sites }: SiteGridProps) {
                   />
                   <Label htmlFor="international">海外</Label>
                 </div>
-                <div className="flex items-center space-x-2 pt-2">
-                  <Checkbox
-                    id="iframe-only"
-                    checked={showIframeOnly}
-                    onCheckedChange={(checked) =>
-                      setShowIframeOnly(checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="iframe-only">
-                    iframeで表示可能なサイトのみ
-                  </Label>
-                </div>
               </div>
             </div>
 
@@ -270,7 +248,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-wrap gap-4">
             {currentItems.map((site, index) => (
               <SiteCard key={site.id || `site-${index}`} site={site} />
             ))}

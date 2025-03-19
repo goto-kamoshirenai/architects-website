@@ -7,6 +7,8 @@ export interface ArchitectSite {
   location: string;
   canDisplayIframe: boolean;
   thumbnail?: string;
+  rate: number;
+  notQuote: boolean;
 }
 
 import fs from "fs";
@@ -22,6 +24,8 @@ interface CSVRecord {
   isInternational: string;
   location: string;
   canDisplayIframe: string;
+  rate: number;
+  notQuote: string;
 }
 
 // CSVファイルからデータを読み込む関数
@@ -40,15 +44,23 @@ function loadArchitectSitesFromCSV(): ArchitectSite[] {
     }) as CSVRecord[];
 
     // データを変換する
-    return records.map((record: CSVRecord) => ({
-      id: record.id,
-      url: record.url,
-      name: record.name,
-      furigana: record.furigana.trim(),
-      isInternational: record.isInternational === "Yes",
-      location: record.location,
-      canDisplayIframe: record.canDisplayIframe === "Yes",
-    }));
+    const sites = records.map((record: CSVRecord) => {
+      const site = {
+        id: record.id,
+        url: record.url,
+        name: record.name,
+        furigana: record.furigana.trim(),
+        isInternational: record.isInternational === "Yes",
+        location: record.location,
+        canDisplayIframe: record.canDisplayIframe === "Yes",
+        rate: record.rate,
+        notQuote: record.notQuote === "Yes",
+      };
+
+      return site;
+    });
+
+    return sites;
   } catch (error) {
     console.error("CSVファイルの読み込みに失敗しました:", error);
     throw new Error("CSVファイルの読み込みに失敗しました");

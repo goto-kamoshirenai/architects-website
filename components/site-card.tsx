@@ -13,7 +13,10 @@ interface SiteCardProps {
 export function SiteCard({ site }: SiteCardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const handleIframeLoad = () => {
     setIsLoading(false);
@@ -22,11 +25,45 @@ export function SiteCard({ site }: SiteCardProps) {
   const handleIframeError = () => {
     setIsLoading(false);
     setHasError(true);
+
+    // iframeがロードに失敗した理由をコンソールに出力
+    console.warn(
+      `[Site Error] ${site.name}: iframeのロードに失敗しました。サイトのセキュリティ設定により埋め込みが制限されている可能性があります。`
+    );
   };
+
+  // Intersection Observerを使って要素が表示されたかどうかを監視
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 } // 10%以上表示されたら可視と判定
+    );
+
+    observer.observe(cardRef.current);
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
+
+  // 可視状態になったらiframeをロード
+  useEffect(() => {
+    if (isVisible && site.canDisplayIframe) {
+      setShouldLoad(true);
+    }
+  }, [isVisible, site.canDisplayIframe]);
 
   // iframeのエラーを検出するためのタイムアウト
   useEffect(() => {
-    if (!site.canDisplayIframe) return;
+    if (!shouldLoad || !site.canDisplayIframe) return;
 
     // 5秒後にまだロード中の場合はエラーとみなす
     const timeoutId = setTimeout(() => {
@@ -37,33 +74,114 @@ export function SiteCard({ site }: SiteCardProps) {
     }, 5000);
 
     return () => clearTimeout(timeoutId);
-  }, [isLoading, site.canDisplayIframe]);
+  }, [isLoading, shouldLoad, site.canDisplayIframe]);
 
   // コンソールエラーを抑制するためのエラーハンドラー
   useEffect(() => {
+    // オリジナルのコンソールメソッドを保存
     const originalConsoleError = console.error;
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleInfo = console.info;
+    const originalConsoleDebug = console.debug;
 
-    // 特定のエラーメッセージを抑制
-    console.error = (...args) => {
-      const errorMessage = args[0]?.toString() || "";
+    // すべてのコンソールメソッドをオーバーライド
+    type ConsoleMethod = (...data: unknown[]) => void;
 
-      // React関連のエラーやiframe関連のエラーを抑制
-      if (
-        errorMessage.includes("Minified React error") ||
-        errorMessage.includes("X-Frame-Options") ||
-        errorMessage.includes("Content Security Policy") ||
-        errorMessage.includes("frame-ancestors")
-      ) {
-        return;
-      }
+    const handleConsoleMessage = (
+      originalMethod: ConsoleMethod
+    ): ConsoleMethod => {
+      return (...args: unknown[]) => {
+        const errorMessage = args[0]?.toString() || "";
 
-      originalConsoleError(...args);
+        // 自分のアプリからの特定のメッセージは常に表示
+        if (typeof args[0] === "string" && args[0].startsWith("[Site Error]")) {
+          originalMethod(...args);
+          return;
+        }
+
+        // iframe関連のエラーを検出
+        const isIframeRelated =
+          errorMessage.includes("X-Frame-Options") ||
+          errorMessage.includes("Content Security Policy") ||
+          errorMessage.includes("frame-ancestors") ||
+          errorMessage.includes("Minified React error") ||
+          // その他のiframe関連キーワード
+          errorMessage.includes("iframe") ||
+          errorMessage.includes("frame") ||
+          errorMessage.includes("cross-origin") ||
+          errorMessage.includes("CORS") ||
+          errorMessage.includes("Mixed Content") ||
+          errorMessage.includes("Refused to display") ||
+          errorMessage.includes("Refused to connect");
+
+        // スタックトレースにサイトのURLが含まれているかチェック
+        const isFromSite =
+          site.url &&
+          (errorMessage.includes(site.url) ||
+            (args[1] && args[1].toString().includes(site.url)));
+
+        // iframeに関連するエラーを検出した場合、カスタムメッセージをログに出す
+        if (
+          isIframeRelated &&
+          site.url &&
+          originalMethod === originalConsoleError
+        ) {
+          // エラーの種類を判別
+          let errorType = "不明なエラー";
+          if (errorMessage.includes("X-Frame-Options")) {
+            errorType = "X-Frame-Optionsポリシー違反";
+          } else if (errorMessage.includes("Content Security Policy")) {
+            errorType = "Content Security Policy違反";
+          } else if (
+            errorMessage.includes("cross-origin") ||
+            errorMessage.includes("CORS")
+          ) {
+            errorType = "クロスオリジンポリシー違反";
+          } else if (errorMessage.includes("Mixed Content")) {
+            errorType = "混合コンテンツポリシー違反";
+          } else if (errorMessage.includes("Refused to")) {
+            errorType = "接続拒否";
+          }
+
+          // カスタムメッセージを出力
+          originalConsoleWarn(
+            `[Site Error] ${
+              site.name
+            }: ${errorType}により埋め込みが制限されています。詳細: ${errorMessage.substring(
+              0,
+              150
+            )}...`
+          );
+          return;
+        }
+
+        // iframeに関連するエラーまたはサイトからのエラーの場合は抑制
+        if (isIframeRelated || isFromSite) {
+          return;
+        }
+
+        // それ以外のメッセージは通常通り出力
+        originalMethod(...args);
+      };
     };
+
+    // すべてのコンソールメソッドを置き換え
+    console.error = handleConsoleMessage(originalConsoleError);
+    console.log = handleConsoleMessage(originalConsoleLog);
+    console.warn = handleConsoleMessage(originalConsoleWarn);
+    console.info = handleConsoleMessage(originalConsoleInfo);
+    console.debug = handleConsoleMessage(originalConsoleDebug);
 
     return () => {
+      // クリーンアップ時に元のメソッドに戻す
       console.error = originalConsoleError;
+      console.log = originalConsoleLog;
+      console.warn = originalConsoleWarn;
+      console.info = originalConsoleInfo;
+      console.debug = originalConsoleDebug;
     };
-  }, []);
+  }, [site.url]);
 
   // サイトのプレビューを表示
   const renderPreview = () => {
@@ -100,28 +218,41 @@ export function SiteCard({ site }: SiteCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-lg border-border/50">
+    <Card
+      className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-lg border-border/50"
+      ref={cardRef}
+    >
       <CardContent className="p-0 relative flex-1">
         <div className="aspect-video w-full overflow-hidden bg-background">
           {site.canDisplayIframe && !hasError ? (
             <>
-              {isLoading && (
+              {isLoading && shouldLoad && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                   <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
                 </div>
               )}
-              <iframe
-                ref={iframeRef}
-                src={site.url}
-                title={site.name}
-                className="w-full h-full border-0"
-                style={{ opacity: isLoading ? 0 : 1 }}
-                onLoad={handleIframeLoad}
-                onError={handleIframeError}
-                sandbox="allow-scripts allow-same-origin"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-              />
+              {shouldLoad ? (
+                <iframe
+                  ref={iframeRef}
+                  src={site.url}
+                  title={site.name}
+                  className="w-full h-full border-0"
+                  style={{ opacity: isLoading ? 0 : 1 }}
+                  onLoad={handleIframeLoad}
+                  onError={handleIframeError}
+                  sandbox="allow-scripts allow-same-origin"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="text-center p-4">
+                    <p className="text-sm text-muted-foreground">
+                      スクロールすると表示されます
+                    </p>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             renderPreview()

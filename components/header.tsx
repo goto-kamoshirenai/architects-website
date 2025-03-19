@@ -28,7 +28,13 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Image src="/logo-short.svg" alt="logo" width={70} height={24} />
+        <Image
+          src="/logo-short.svg"
+          alt="logo"
+          width={70}
+          height={24}
+          style={{ height: "auto" }}
+        />
         <nav className="hidden md:flex space-x-8">
           <Link
             href="/"

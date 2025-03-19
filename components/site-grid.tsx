@@ -36,7 +36,9 @@ export function SiteGrid({ sites }: SiteGridProps) {
   const [showInternational, setShowInternational] = useState(true);
   const [showDomestic, setShowDomestic] = useState(true);
   const [showIframeOnly, setShowIframeOnly] = useState(true);
-  const [sortOrder, setSortOrder] = useState<"name" | "location">("name");
+  const [sortOrder, setSortOrder] = useState<"name" | "location" | "rate">(
+    "rate"
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -70,6 +72,11 @@ export function SiteGrid({ sites }: SiteGridProps) {
 
   const filteredSites = sites
     .filter((site) => {
+      // notQuoteがtrueのデータは除外
+      if (site.notQuote) {
+        return false;
+      }
+
       const matchesSearch =
         site.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         site.furigana.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -81,13 +88,21 @@ export function SiteGrid({ sites }: SiteGridProps) {
 
       const matchesIframeFilter = !showIframeOnly || site.canDisplayIframe;
 
-      return matchesSearch && matchesFilter && matchesIframeFilter;
+      const shouldInclude =
+        matchesSearch && matchesFilter && matchesIframeFilter;
+
+      return shouldInclude;
     })
     .sort((a, b) => {
-      if (sortOrder === "name") {
+      if (sortOrder === "rate") {
+        return b.rate - a.rate;
+      } else if (sortOrder === "name") {
         return a.name.localeCompare(b.name);
-      } else {
+      } else if (sortOrder === "location") {
         return a.location.localeCompare(b.location);
+      } else {
+        // おすすめ順（rateの高い順）
+        return b.rate - a.rate;
       }
     });
 
@@ -226,9 +241,13 @@ export function SiteGrid({ sites }: SiteGridProps) {
               <RadioGroup
                 value={sortOrder}
                 onValueChange={(value) =>
-                  setSortOrder(value as "name" | "location")
+                  setSortOrder(value as "name" | "location" | "rate")
                 }
               >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="rate" id="sort-rate" />
+                  <Label htmlFor="sort-rate">おすすめ順</Label>
+                </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="name" id="sort-name" />
                   <Label htmlFor="sort-name">名前</Label>

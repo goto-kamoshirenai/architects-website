@@ -19,8 +19,6 @@ export async function getArchitectSitesFromNotion(): Promise<ArchitectSite[]> {
       database_id: databaseId,
     });
 
-    console.log(response);
-
     // IDの重複をチェックするためのセット
     const usedIds = new Set<string>();
 
@@ -48,6 +46,8 @@ export async function getArchitectSitesFromNotion(): Promise<ArchitectSite[]> {
         isInternational: properties.isInternational?.checkbox || false,
         location: properties.location?.rich_text?.[0]?.plain_text || "",
         canDisplayIframe: properties.canDisplayIframe?.checkbox || false,
+        rate: properties.rate?.formula?.number || 0,
+        notQuote: properties.notQuote?.checkbox || false,
       };
     });
 

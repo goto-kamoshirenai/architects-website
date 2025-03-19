@@ -14,7 +14,13 @@ export default async function Home() {
     return (
       <main className="flex-1 container mx-auto px-4">
         <div className="max-w-3xl mx-auto flex flex-col items-center text-center mb-2 gap-2 mt-6">
-          <Image src="/logo.svg" alt="logo" width={500} height={100} />
+          <Image
+            src="/logo.svg"
+            alt="logo"
+            width={500}
+            height={100}
+            style={{ height: "auto" }}
+          />
           <p className="text-xl text-muted-foreground mb-8">
             建築家のウェブサイトデータベース
           </p>

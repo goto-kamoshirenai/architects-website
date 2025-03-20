@@ -23,7 +23,7 @@ export function Header() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-background backdrop-blur-md border-b border-border/50"
+          ? "bg-background backdrop-blur-md border-b border-forest/20"
           : "bg-background"
       }`}
     >

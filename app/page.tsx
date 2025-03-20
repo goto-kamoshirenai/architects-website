@@ -21,7 +21,7 @@ export default async function Home() {
             height={100}
             style={{ height: "auto" }}
           />
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-muted-foreground mb-8 text-forest">
             建築家のウェブサイトデータベース
           </p>
         </div>

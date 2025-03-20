@@ -13,9 +13,14 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
+  Globe,
+  MapPin,
+  HelpCircle,
+  Settings,
+  Filter,
+  Info,
 } from "lucide-react";
 import {
   Select,
@@ -24,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SiteGridProps {
   sites: ArchitectSite[];
@@ -40,6 +46,11 @@ export function SiteGrid({ sites }: SiteGridProps) {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  // 表示項目の設定
+  const [showLocation, setShowLocation] = useState(true);
+  const [showTech, setShowTech] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -121,123 +132,319 @@ export function SiteGrid({ sites }: SiteGridProps) {
     }
   };
 
+  // アニメーション用の設定
+  const panelVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+    exit: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   return (
     <div className="space-y-8">
       <div
-        className={`sticky top-16 z-10 p-2 backdrop-blur-md bg-background transition-all duration-300 ${
-          isScrolled ? "shadow-md" : ""
+        className={`sticky top-16 z-10 backdrop-blur-md bg-background/95 border-b border-forest/20 rounded-lg transition-all duration-300 ${
+          isScrolled ? "shadow-sm" : ""
         }`}
       >
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search architects..."
-            className="pl-10 h-12 bg-muted/50 focus-visible:ring-primary"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {searchTerm && (
-            <button
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={() => setSearchTerm("")}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        <div className="mt-2 flex justify-between items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <SlidersHorizontal size={16} className="mr-2" />
-            Filter & Sort
-            {isFilterOpen ? (
-              <ChevronUp size={16} className="ml-2" />
-            ) : (
-              <ChevronDown size={16} className="ml-2" />
+        <div className="p-4">
+          <div className="relative mb-4">
+            <div className="absolute left-0 top-0 bottom-0 w-10 bg-forest/90 rounded-l-md flex items-center justify-center">
+              <Search className="h-4 w-4 text-white" />
+            </div>
+            <Input
+              type="search"
+              placeholder="建築家や事務所を検索..."
+              className="pl-12 h-11 border border-forest/30 rounded-md focus-visible:ring-1 focus-visible:ring-forest/50 focus-visible:border-forest/50 shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-forest/70 hover:text-forest"
+                onClick={() => setSearchTerm("")}
+              >
+                <X size={16} />
+              </button>
             )}
-          </Button>
+          </div>
 
-          <div className="flex items-center space-x-2">
-            <Label
-              htmlFor="items-per-page"
-              className="text-sm text-muted-foreground"
-            >
-              表示件数:
-            </Label>
-            <Select
-              value={itemsPerPage.toString()}
-              onValueChange={(value) => setItemsPerPage(Number(value))}
-            >
-              <SelectTrigger className="w-[80px] h-8">
-                <SelectValue placeholder="10" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap justify-between items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant={isFilterOpen ? "default" : "outline"}
+                size="sm"
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className={`transition-all duration-200 ${
+                  isFilterOpen
+                    ? "bg-forest text-white"
+                    : "border-forest/50 text-forest hover:bg-forest/5"
+                }`}
+              >
+                <Filter
+                  size={16}
+                  className={`mr-2 ${
+                    isFilterOpen ? "text-white" : "text-forest/70"
+                  }`}
+                />
+                フィルター
+                {isFilterOpen ? (
+                  <ChevronUp size={16} className="ml-2" />
+                ) : (
+                  <ChevronDown size={16} className="ml-2" />
+                )}
+              </Button>
+
+              <Button
+                variant={isHelpOpen ? "default" : "outline"}
+                size="sm"
+                onClick={() => setIsHelpOpen(!isHelpOpen)}
+                className={`transition-all duration-200 ${
+                  isHelpOpen
+                    ? "bg-forest text-white"
+                    : "border-forest/50 text-forest hover:bg-forest/5"
+                }`}
+              >
+                <Info
+                  size={16}
+                  className={`mr-2 ${
+                    isHelpOpen ? "text-white" : "text-forest/70"
+                  }`}
+                />
+                表示について
+                {isHelpOpen ? (
+                  <ChevronUp size={16} className="ml-2" />
+                ) : (
+                  <ChevronDown size={16} className="ml-2" />
+                )}
+              </Button>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-muted/30 px-2 py-1.5 rounded-md">
+              <Label htmlFor="items-per-page" className="text-sm text-forest">
+                表示件数:
+              </Label>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => setItemsPerPage(Number(value))}
+              >
+                <SelectTrigger className="w-[70px] h-8 border-forest/30 focus:ring-forest/20 bg-white/80">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent className="border-forest/20">
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
-        {isFilterOpen && (
-          <div className="mt-4 p-4 border rounded-md bg-card/50 grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <h3 className="font-medium">Filter by</h3>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="domestic"
-                    checked={showDomestic}
-                    onCheckedChange={(checked) =>
-                      setShowDomestic(checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="domestic">国内</Label>
+        <AnimatePresence>
+          {isFilterOpen && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={panelVariants}
+              className="overflow-hidden"
+            >
+              <div className="mx-4 mb-4 p-4 border border-forest/20 rounded-md bg-white/80 grid gap-6 md:grid-cols-3 shadow-sm">
+                <div className="space-y-3">
+                  <h3 className="font-medium text-forest flex items-center gap-2">
+                    <Globe size={16} className="text-forest/70" />
+                    表示フィルター
+                  </h3>
+                  <div className="space-y-2 pl-1">
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <Checkbox
+                        id="domestic"
+                        checked={showDomestic}
+                        onCheckedChange={(checked) =>
+                          setShowDomestic(checked as boolean)
+                        }
+                        className="border-forest/50 data-[state=checked]:bg-forest data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor="domestic" className="cursor-pointer">
+                        国内
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <Checkbox
+                        id="international"
+                        checked={showInternational}
+                        onCheckedChange={(checked) =>
+                          setShowInternational(checked as boolean)
+                        }
+                        className="border-forest/50 data-[state=checked]:bg-forest data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor="international" className="cursor-pointer">
+                        海外
+                      </Label>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="international"
-                    checked={showInternational}
-                    onCheckedChange={(checked) =>
-                      setShowInternational(checked as boolean)
+
+                <div className="space-y-3">
+                  <h3 className="font-medium text-forest flex items-center gap-2">
+                    <Settings size={16} className="text-forest/70" />
+                    並び順
+                  </h3>
+                  <RadioGroup
+                    value={sortOrder}
+                    onValueChange={(value) =>
+                      setSortOrder(value as "name" | "location" | "rate")
                     }
-                  />
-                  <Label htmlFor="international">海外</Label>
+                    className="pl-1 space-y-2"
+                  >
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <RadioGroupItem
+                        value="rate"
+                        id="sort-rate"
+                        className="border-forest/50 text-forest"
+                      />
+                      <Label htmlFor="sort-rate" className="cursor-pointer">
+                        おすすめ順
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <RadioGroupItem
+                        value="name"
+                        id="sort-name"
+                        className="border-forest/50 text-forest"
+                      />
+                      <Label htmlFor="sort-name" className="cursor-pointer">
+                        名前順
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <RadioGroupItem
+                        value="location"
+                        id="sort-location"
+                        className="border-forest/50 text-forest"
+                      />
+                      <Label htmlFor="sort-location" className="cursor-pointer">
+                        所在地順
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="font-medium text-forest flex items-center gap-2">
+                    <Settings size={16} className="text-forest/70" />
+                    表示項目
+                  </h3>
+                  <div className="space-y-2 pl-1">
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <Checkbox
+                        id="show-location"
+                        checked={showLocation}
+                        onCheckedChange={(checked) =>
+                          setShowLocation(checked as boolean)
+                        }
+                        className="border-forest/50 data-[state=checked]:bg-forest data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor="show-location" className="cursor-pointer">
+                        所在地
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 hover:bg-forest/5 p-1.5 rounded-md transition-colors">
+                      <Checkbox
+                        id="show-tech"
+                        checked={showTech}
+                        onCheckedChange={(checked) =>
+                          setShowTech(checked as boolean)
+                        }
+                        className="border-forest/50 data-[state=checked]:bg-forest data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor="show-tech" className="cursor-pointer">
+                        使用技術
+                      </Label>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            <div className="space-y-4">
-              <h3 className="font-medium">Sort by</h3>
-              <RadioGroup
-                value={sortOrder}
-                onValueChange={(value) =>
-                  setSortOrder(value as "name" | "location" | "rate")
-                }
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="rate" id="sort-rate" />
-                  <Label htmlFor="sort-rate">おすすめ順</Label>
+        {/* 表示方法の説明 */}
+        <AnimatePresence>
+          {isHelpOpen && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={panelVariants}
+              className="overflow-hidden"
+            >
+              <div className="mx-4 mb-4 p-4 border border-forest/20 rounded-md bg-white/80 shadow-sm">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-forest flex items-center gap-2">
+                        <Info size={16} className="text-forest/70" />
+                        建築事務所について
+                      </h3>
+                    </div>
+                    <p className="text-sm text-forest/80 pl-1">
+                      カードをクリックすると、その事務所のウェブサイトが新しいタブで開きます。
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-forest flex items-center gap-2">
+                        <HelpCircle size={16} className="text-forest/70" />
+                        アイコンの説明
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-forest/80 pl-1">
+                      <div className="flex items-center gap-1.5">
+                        <Globe size={14} className="text-forest" />
+                        <span>海外事務所</span>
+                      </div>
+                      <span className="mx-1 text-forest/40">|</span>
+                      <div className="flex items-center gap-1.5">
+                        <MapPin size={14} className="text-forest" />
+                        <span>国内事務所</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-forest flex items-center gap-2">
+                        <Settings size={16} className="text-forest/70" />
+                        使用技術
+                      </h3>
+                    </div>
+                    <div className="text-sm text-forest/80 pl-1">
+                      <span>
+                        Webサイトで使用されている技術をアイコンで表示しています。
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="name" id="sort-name" />
-                  <Label htmlFor="sort-name">名前</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="location" id="sort-location" />
-                  <Label htmlFor="sort-location">所在地</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
-        )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {filteredSites.length === 0 ? (
@@ -249,8 +456,14 @@ export function SiteGrid({ sites }: SiteGridProps) {
       ) : (
         <>
           <div className="flex flex-wrap gap-4">
+            {/* 実際のサイトカード */}
             {currentItems.map((site, index) => (
-              <SiteCard key={site.id || `site-${index}`} site={site} />
+              <SiteCard
+                key={site.id || `site-${index}`}
+                site={site}
+                showLocation={showLocation}
+                showTech={showTech}
+              />
             ))}
           </div>
 

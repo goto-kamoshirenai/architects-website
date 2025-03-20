@@ -9,6 +9,7 @@ export interface ArchitectSite {
   thumbnail?: string;
   rate: number;
   notQuote: boolean;
+  tech: string[];
 }
 
 import fs from "fs";
@@ -26,6 +27,7 @@ interface CSVRecord {
   canDisplayIframe: string;
   rate: number;
   notQuote: string;
+  tech: string[];
 }
 
 // CSVファイルからデータを読み込む関数
@@ -55,6 +57,7 @@ function loadArchitectSitesFromCSV(): ArchitectSite[] {
         canDisplayIframe: record.canDisplayIframe === "Yes",
         rate: record.rate,
         notQuote: record.notQuote === "Yes",
+        tech: record.tech,
       };
 
       return site;

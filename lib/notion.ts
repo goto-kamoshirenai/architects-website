@@ -48,7 +48,10 @@ export async function getArchitectSitesFromNotion(): Promise<ArchitectSite[]> {
         canDisplayIframe: properties.canDisplayIframe?.checkbox || false,
         rate: properties.rate?.formula?.number || 0,
         notQuote: properties.notQuote?.checkbox || false,
-        tech: properties.tech?.multi_select.map((tech: any) => tech.name) || [],
+        tech:
+          properties.tech?.multi_select.map(
+            (tech: { name: string }) => tech.name
+          ) || [],
       };
     });
 

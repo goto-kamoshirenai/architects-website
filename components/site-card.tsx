@@ -6,6 +6,7 @@ import type { ArchitectSite } from "@/lib/dataConst";
 import { iconMapping } from "@/lib/icon.const";
 import { Globe, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { RadarChart } from "./radar-chart";
 
 interface SiteCardProps {
   site: ArchitectSite;
@@ -21,6 +22,8 @@ export function SiteCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
+
+  console.log(site);
 
   // Intersection Observerを使って要素が表示されたかどうかを監視
   useEffect(() => {
@@ -112,57 +115,66 @@ export function SiteCard({
           </motion.div>
         )}
 
-        {showTech && (
+        <div className="flex justify-center">
+          <RadarChart
+            performance={site.performancePoint || 0}
+            seo={site.seoPoint || 0}
+            accessibility={site.accessibilityPoint || 0}
+            techStack={site.techStackPoint || 0}
+            responsive={site.responsivePoint || 0}
+            rate={site.rate}
+          />
+        </div>
+
+        {showTech && hasTech && (
           <motion.div
             className="flex items-center gap-2 mt-1 min-h-[24px]"
             animate={{ opacity: isHovered ? 1 : 0.7 }}
             transition={{ duration: 0.2 }}
           >
-            {hasTech
-              ? site.tech.map((techName, index) => {
-                  const techItem = iconMapping.find(
-                    (item) => item.key === techName
-                  );
-                  return (
-                    techItem && (
-                      <div key={index} className="relative">
-                        <motion.span
-                          className="text-muted-foreground"
-                          onHoverStart={() => setHoveredTech(techItem.key)}
-                          onHoverEnd={() => setHoveredTech(null)}
-                          whileHover={{ scale: 1.2, rotate: 5 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                          animate={{
-                            color: isHovered
-                              ? "hsl(var(--primary))"
-                              : "hsl(var(--foreground))",
+            {site.tech.map((techName, index) => {
+              const techItem = iconMapping.find(
+                (item) => item.key === techName
+              );
+              return (
+                techItem && (
+                  <div key={index} className="relative">
+                    <motion.span
+                      className="text-muted-foreground"
+                      onHoverStart={() => setHoveredTech(techItem.key)}
+                      onHoverEnd={() => setHoveredTech(null)}
+                      whileHover={{ scale: 1.2, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      animate={{
+                        color: isHovered
+                          ? "hsl(var(--primary))"
+                          : "hsl(var(--foreground))",
+                      }}
+                    >
+                      {techItem.icon}
+                    </motion.span>
+                    <AnimatePresence>
+                      {hoveredTech === techItem.key && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 5, scale: 0.8 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute z-10 bg-forest text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+                          style={{
+                            top: "-25px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
                           }}
                         >
-                          {techItem.icon}
-                        </motion.span>
-                        <AnimatePresence>
-                          {hoveredTech === techItem.key && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 5, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="absolute z-10 bg-forest text-white text-xs px-2 py-1 rounded whitespace-nowrap"
-                              style={{
-                                top: "-25px",
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                              }}
-                            >
-                              {techItem.label}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    )
-                  );
-                })
-              : null}
+                          {techItem.label}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              );
+            })}
           </motion.div>
         )}
       </Card>

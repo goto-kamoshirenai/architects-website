@@ -10,6 +10,11 @@ export interface ArchitectSite {
   rate: number;
   notQuote: boolean;
   tech: string[];
+  performancePoint: number;
+  seoPoint: number;
+  accessibilityPoint: number;
+  techStackPoint: number;
+  responsivePoint: number;
 }
 
 import fs from "fs";
@@ -28,6 +33,11 @@ interface CSVRecord {
   rate: number;
   notQuote: string;
   tech: string[];
+  performancePoint: string;
+  seoPoint: string;
+  accessibilityPoint: string;
+  techStackPoint: string;
+  responsivePoint: string;
 }
 
 // CSVファイルからデータを読み込む関数
@@ -58,6 +68,11 @@ function loadArchitectSitesFromCSV(): ArchitectSite[] {
         rate: record.rate,
         notQuote: record.notQuote === "Yes",
         tech: record.tech,
+        performancePoint: Number(record.performancePoint || 0),
+        seoPoint: Number(record.seoPoint || 0),
+        accessibilityPoint: Number(record.accessibilityPoint || 0),
+        techStackPoint: Number(record.techStackPoint || 0),
+        responsivePoint: Number(record.responsivePoint || 0),
       };
 
       return site;

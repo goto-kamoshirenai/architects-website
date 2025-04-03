@@ -52,6 +52,11 @@ export async function getArchitectSitesFromNotion(): Promise<ArchitectSite[]> {
           properties.tech?.multi_select.map(
             (tech: { name: string }) => tech.name
           ) || [],
+        performancePoint: properties.performancePoint?.number || 0,
+        seoPoint: properties.seoPoint?.number || 0,
+        accessibilityPoint: properties.accessibilityPoint?.number || 0,
+        techStackPoint: properties.techStackPoint?.number || 0,
+        responsivePoint: properties.responsivePoint?.number || 0,
       };
     });
 

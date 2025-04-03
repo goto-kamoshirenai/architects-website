@@ -108,8 +108,8 @@ export function RadarChart({
             key={`grid-${i}`}
             points={points}
             fill="none"
-            stroke="rgba(220, 229, 235, 0.3)"
-            strokeWidth="0.5"
+            stroke="rgba(185, 185, 185, 0.7)"
+            strokeWidth="0.8"
           />
         ))}
 
@@ -118,16 +118,16 @@ export function RadarChart({
           <path
             key={`axis-${i}`}
             d={d}
-            stroke="rgba(220, 229, 235, 0.3)"
-            strokeWidth="0.5"
+            stroke="rgba(220, 229, 235, 0.7)"
+            strokeWidth="0.8"
           />
         ))}
 
         {/* Data Polygon */}
         <polygon
           points={dataPolygon}
-          fill="rgba(54, 86, 60, 0.03)"
-          stroke="rgba(54, 86, 60, 0.5)"
+          fill="rgba(54, 86, 60, 0.3)"
+          stroke="rgba(54, 86, 60, 0.7)"
           strokeWidth="1"
         />
 

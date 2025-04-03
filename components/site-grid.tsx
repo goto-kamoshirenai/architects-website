@@ -21,6 +21,7 @@ import {
   Settings,
   Filter,
   Info,
+  Menu,
 } from "lucide-react";
 import {
   Select,
@@ -47,6 +48,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // 表示項目の設定
   const [showLocation, setShowLocation] = useState(true);
@@ -156,7 +158,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
   return (
     <div className="space-y-8">
       <div
-        className={`sticky top-16 z-10 backdrop-blur-md bg-background/95 border-b border-forest/20 rounded-lg transition-all duration-300 ${
+        className={`sm:sticky top-16 z-10 backdrop-blur-md bg-background/95 border-b border-forest/20 rounded-lg transition-all duration-300 ${
           isScrolled ? "shadow-sm" : ""
         }`}
       >
@@ -174,7 +176,7 @@ export function SiteGrid({ sites }: SiteGridProps) {
             />
             {searchTerm && (
               <button
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-forest/70 hover:text-forest"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-forest hover:text-forest"
                 onClick={() => setSearchTerm("")}
               >
                 <X size={16} />
@@ -182,50 +184,21 @@ export function SiteGrid({ sites }: SiteGridProps) {
             )}
           </div>
 
-          <div className="flex flex-wrap justify-between items-center gap-3">
-            <div className="flex items-center gap-2">
+          <div className="w-full flex flex-wrap justify-between items-center gap-3">
+            <div className="w-full flex justify-between items-center sm:hidden">
               <Button
-                variant={isFilterOpen ? "default" : "outline"}
+                variant={isMobileMenuOpen ? "default" : "outline"}
                 size="sm"
-                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`transition-all duration-200 ${
-                  isFilterOpen
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={`w-40 mx-auto transition-all duration-200 ${
+                  isMobileMenuOpen
                     ? "bg-forest text-white"
                     : "border-forest/50 text-forest hover:bg-forest/5"
                 }`}
               >
-                <Filter
-                  size={16}
-                  className={`mr-2 ${
-                    isFilterOpen ? "text-white" : "text-forest/70"
-                  }`}
-                />
-                フィルター
-                {isFilterOpen ? (
-                  <ChevronUp size={16} className="ml-2" />
-                ) : (
-                  <ChevronDown size={16} className="ml-2" />
-                )}
-              </Button>
-
-              <Button
-                variant={isHelpOpen ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsHelpOpen(!isHelpOpen)}
-                className={`transition-all duration-200 ${
-                  isHelpOpen
-                    ? "bg-forest text-white"
-                    : "border-forest/50 text-forest hover:bg-forest/5"
-                }`}
-              >
-                <Info
-                  size={16}
-                  className={`mr-2 ${
-                    isHelpOpen ? "text-white" : "text-forest/70"
-                  }`}
-                />
-                表示について
-                {isHelpOpen ? (
+                <Menu size={16} className="mr-2" />
+                メニュー
+                {isMobileMenuOpen ? (
                   <ChevronUp size={16} className="ml-2" />
                 ) : (
                   <ChevronDown size={16} className="ml-2" />
@@ -233,23 +206,79 @@ export function SiteGrid({ sites }: SiteGridProps) {
               </Button>
             </div>
 
-            <div className="flex items-center space-x-2 bg-muted/30 px-2 py-1.5 rounded-md">
-              <Label htmlFor="items-per-page" className="text-sm text-forest">
-                表示件数:
-              </Label>
-              <Select
-                value={itemsPerPage.toString()}
-                onValueChange={(value) => setItemsPerPage(Number(value))}
-              >
-                <SelectTrigger className="w-[70px] h-8 border-forest/30 focus:ring-forest/20 bg-white/80">
-                  <SelectValue placeholder="25" />
-                </SelectTrigger>
-                <SelectContent className="border-forest/20">
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
+            <div
+              className={`w-full sm:flex flex-wrap justify-between items-center gap-3 ${
+                isMobileMenuOpen ? "flex" : "hidden"
+              }`}
+            >
+              <div className="flex sm:flex-row flex-col items-center gap-2">
+                <Button
+                  variant={isFilterOpen ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className={`w-40 transition-all duration-200 ${
+                    isFilterOpen
+                      ? "bg-forest text-white"
+                      : "border-forest/50 text-forest hover:bg-forest/5"
+                  }`}
+                >
+                  <Filter
+                    size={16}
+                    className={`mr-2 ${
+                      isFilterOpen ? "text-white" : "text-forest/70"
+                    }`}
+                  />
+                  フィルター
+                  {isFilterOpen ? (
+                    <ChevronUp size={16} className="ml-2" />
+                  ) : (
+                    <ChevronDown size={16} className="ml-2" />
+                  )}
+                </Button>
+
+                <Button
+                  variant={isHelpOpen ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsHelpOpen(!isHelpOpen)}
+                  className={`w-40 transition-all duration-200 ${
+                    isHelpOpen
+                      ? "bg-forest text-white"
+                      : "border-forest/50 text-forest hover:bg-forest/5"
+                  }`}
+                >
+                  <Info
+                    size={16}
+                    className={`mr-2 ${
+                      isHelpOpen ? "text-white" : "text-forest/70"
+                    }`}
+                  />
+                  表示について
+                  {isHelpOpen ? (
+                    <ChevronUp size={16} className="ml-2" />
+                  ) : (
+                    <ChevronDown size={16} className="ml-2" />
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-2 bg-muted/30 px-2 py-1.5 rounded-md">
+                <Label htmlFor="items-per-page" className="text-sm text-forest">
+                  表示件数:
+                </Label>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => setItemsPerPage(Number(value))}
+                >
+                  <SelectTrigger className="w-[70px] h-8 border-forest/30 focus:ring-forest/20 bg-white/80">
+                    <SelectValue placeholder="25" />
+                  </SelectTrigger>
+                  <SelectContent className="border-forest/20">
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -455,21 +484,21 @@ export function SiteGrid({ sites }: SiteGridProps) {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap gap-4">
-            {/* 実際のサイトカード */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentItems.map((site, index) => (
-              <SiteCard
-                key={site.id || `site-${index}`}
-                site={site}
-                showLocation={showLocation}
-                showTech={showTech}
-              />
+              <div key={site.id || `site-${index}`} className="w-full">
+                <SiteCard
+                  site={site}
+                  showLocation={showLocation}
+                  showTech={showTech}
+                />
+              </div>
             ))}
           </div>
 
           {/* ページネーション */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 ">
+            <div className="flex justify-center items-center space-x-2">
               <Button
                 variant="outline"
                 size="icon"

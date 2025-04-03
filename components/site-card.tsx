@@ -60,36 +60,39 @@ export function SiteCard({
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -8 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
       <Card
-        className="overflow-hidden h-full flex flex-col cursor-pointer relative p-4"
+        className="overflow-hidden h-full flex flex-col cursor-pointer relative p-6"
         ref={cardRef}
         onClick={handleClick}
         style={{
           backgroundColor: isHovered
             ? "var(--card)"
-            : "rgba(255, 255, 255, 0.01)",
+            : "rgba(255, 255, 255, 0.02)",
           borderColor: "hsl(var(--primary))",
           borderWidth: "0.5px",
           boxShadow: isHovered
-            ? "0 10px 25px -5px rgba(54, 86, 60, 0.25), 0 8px 10px -6px rgba(54, 86, 60, 0.1), 0 0 0 1.5px hsl(var(--primary-light))"
+            ? "0 20px 40px -15px rgba(54, 86, 60, 0.2), 0 0 0 1px hsl(var(--primary-light))"
             : "none",
-          transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "all 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex items-center gap-3 w-full">
           <motion.h3
-            className="font-bold text-lg line-clamp-1 flex-1"
+            className="font-light text-xl line-clamp-1 flex-1 text-size-adjust-auto"
+            style={{
+              fontSize: "clamp(0.875rem, 4vw, 1.25rem)",
+            }}
             animate={{
               color: isHovered
                 ? "var(--forest, hsl(var(--primary)))"
                 : "var(--foreground)",
             }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             {site.name}
           </motion.h3>
@@ -97,25 +100,25 @@ export function SiteCard({
 
         {showLocation && (
           <motion.div
-            className="flex items-center gap-2 text-sm text-muted-foreground"
+            className="flex items-center gap-2 text-sm mt-2"
             animate={{
               opacity: isHovered ? 0.9 : 0.7,
               color: isHovered
                 ? "hsl(var(--primary))"
                 : "hsl(var(--foreground))",
             }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             {site.isInternational ? (
-              <Globe size={16} className="text-forest" />
+              <Globe size={16} className="text-forest/80" />
             ) : (
-              <MapPin size={16} className="text-forest" />
+              <MapPin size={16} className="text-forest/80" />
             )}
             <span>{site.location}</span>
           </motion.div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center ">
           <RadarChart
             performance={site.performancePoint || 0}
             seo={site.seoPoint || 0}
@@ -128,9 +131,9 @@ export function SiteCard({
 
         {showTech && hasTech && (
           <motion.div
-            className="flex items-center gap-2 mt-1 min-h-[24px]"
+            className="flex items-center gap-3 mt-2 min-h-[24px]"
             animate={{ opacity: isHovered ? 1 : 0.7 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             {site.tech.map((techName, index) => {
               const techItem = iconMapping.find(
@@ -140,7 +143,7 @@ export function SiteCard({
                 techItem && (
                   <div key={index} className="relative">
                     <motion.span
-                      className="text-muted-foreground"
+                      className="text-muted-foreground sm:text-xl"
                       onHoverStart={() => setHoveredTech(techItem.key)}
                       onHoverEnd={() => setHoveredTech(null)}
                       whileHover={{ scale: 1.2, rotate: 5 }}
@@ -160,9 +163,9 @@ export function SiteCard({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 5, scale: 0.8 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute z-10 bg-forest text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+                          className="absolute z-10 bg-forest text-white text-xs px-3 py-1.5 rounded-full whitespace-nowrap"
                           style={{
-                            top: "-25px",
+                            top: "-30px",
                             left: "50%",
                             transform: "translateX(-50%)",
                           }}

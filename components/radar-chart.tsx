@@ -17,22 +17,20 @@ export function RadarChart({
   responsive,
   rate,
 }: RadarChartProps) {
-  const size = 200; // Reduced overall size
+  const size = 200;
   const center = size / 2;
-  const radius = size * 0.3; // Adjusted radius proportion
-  const angles = [0, 72, 144, 216, 288]; // 360 / 5 = 72 degrees
+  const radius = size * 0.3;
+  const angles = [0, 72, 144, 216, 288];
 
-  // Convert polar coordinates to cartesian
   const getPoint = (value: number, angle: number) => {
     const r = (value / 100) * radius;
-    const radian = (angle - 90) * (Math.PI / 180); // -90 to start from top
+    const radian = (angle - 90) * (Math.PI / 180);
     return {
       x: center + r * Math.cos(radian),
       y: center + r * Math.sin(radian),
     };
   };
 
-  // Generate grid lines
   const gridLines = [0.2, 0.4, 0.6, 0.8, 1].map((scale) => {
     const points = angles.map((angle) => {
       const point = getPoint(100 * scale, angle);
@@ -41,7 +39,6 @@ export function RadarChart({
     return points.join(" ");
   });
 
-  // Generate data points and their values
   const dataPoints = [
     { point: getPoint(performance, angles[0]), value: performance },
     { point: getPoint(seo, angles[1]), value: seo },
@@ -50,18 +47,15 @@ export function RadarChart({
     { point: getPoint(responsive, angles[4]), value: responsive },
   ];
 
-  // Generate data polygon points string
   const dataPolygon = dataPoints
     .map((d) => `${d.point.x},${d.point.y}`)
     .join(" ");
 
-  // Generate axis lines
   const axisLines = angles.map((angle) => {
     const point = getPoint(100, angle);
     return `M${center},${center} L${point.x},${point.y}`;
   });
 
-  // Label positions with adjusted spacing
   const labels = [
     {
       text: "P",
@@ -114,8 +108,8 @@ export function RadarChart({
             key={`grid-${i}`}
             points={points}
             fill="none"
-            stroke="rgba(220, 229, 235, 0.5)"
-            strokeWidth="1"
+            stroke="rgba(220, 229, 235, 0.3)"
+            strokeWidth="0.5"
           />
         ))}
 
@@ -124,16 +118,16 @@ export function RadarChart({
           <path
             key={`axis-${i}`}
             d={d}
-            stroke="rgba(220, 229, 235, 0.5)"
-            strokeWidth="1"
+            stroke="rgba(220, 229, 235, 0.3)"
+            strokeWidth="0.5"
           />
         ))}
 
         {/* Data Polygon */}
         <polygon
           points={dataPolygon}
-          fill="rgba(54, 86, 60, 0.05)"
-          stroke="rgba(54, 86, 60, 0.7)"
+          fill="rgba(54, 86, 60, 0.03)"
+          stroke="rgba(54, 86, 60, 0.5)"
           strokeWidth="1"
         />
 
@@ -144,7 +138,7 @@ export function RadarChart({
             cx={d.point.x}
             cy={d.point.y}
             r="2"
-            fill="rgba(54, 86, 60, 1)"
+            fill="rgba(54, 86, 60, 0.8)"
           />
         ))}
 
@@ -156,8 +150,8 @@ export function RadarChart({
               y={label.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="rgba(54, 86, 60, 1)"
-              style={{ fontSize: "12px" }}
+              fill="rgba(54, 86, 60, 0.8)"
+              style={{ fontSize: "12px", fontWeight: "300" }}
             >
               {label.text}
             </text>
@@ -166,8 +160,8 @@ export function RadarChart({
               y={label.valueY}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="rgba(54, 86, 60, 1)"
-              style={{ fontSize: "10px" }}
+              fill="rgba(54, 86, 60, 0.6)"
+              style={{ fontSize: "10px", fontWeight: "300" }}
             >
               {label.value.toFixed(1)}
             </text>
@@ -180,8 +174,8 @@ export function RadarChart({
           y={center - 2}
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="rgba(54, 86, 60, 1)"
-          style={{ fontSize: "16px", fontWeight: "bold" }}
+          fill="rgba(54, 86, 60, 0.8)"
+          style={{ fontSize: "16px", fontWeight: "300" }}
         >
           {rate.toFixed(1)}
         </text>

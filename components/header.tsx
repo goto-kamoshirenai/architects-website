@@ -1,12 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOverWhite, setIsOverWhite] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!buttonRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLElement;
+          const rect = target.getBoundingClientRect();
+          const elementBelow = document.elementFromPoint(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2
+          );
+
+          if (elementBelow) {
+            const computedStyle = window.getComputedStyle(elementBelow);
+            const bgColor = computedStyle.backgroundColor;
+            // 背景色が白または透明に近い場合
+            setIsOverWhite(
+              bgColor === "rgb(255, 255, 255)" ||
+                bgColor === "rgba(0, 0, 0, 0)" ||
+                bgColor.includes("rgba(255, 255, 255")
+            );
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(buttonRef.current);
+
+    return () => {
+      if (buttonRef.current) {
+        observer.unobserve(buttonRef.current);
+      }
+    };
+  }, []);
 
   const menuVariants = {
     desktop: {
@@ -24,9 +63,14 @@ export function Header() {
   return (
     <header className="fixed top-0 right-0 z-50 p-6">
       <Button
+        ref={buttonRef}
         variant="ghost"
         size="icon"
-        className="relative z-[60] text-white hover:text-white/80 bg-forest hover:bg-white/20 w-12 h-12 p-0"
+        className={`relative z-[60] text-white hover:text-white/80 ${
+          isOverWhite
+            ? "bg-forest hover:bg-forest/80"
+            : "bg-white/20 hover:bg-white/20"
+        } w-12 h-12 p-0`}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         <div className="relative w-8 h-8 flex items-center justify-center">
